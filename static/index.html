@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ACP Demo · Kiro Chat</title>
+  <style>
+    :root { --border: #e1e4e8; --user: #d6e8ff; --agent: #f3f4f6; --tool: #fff5d6; --err: #ffd6d6; }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+           max-width: 820px; margin: 24px auto; padding: 0 16px; color: #24292e; }
+    h2 { margin: 0 0 8px; }
+    #status { color: #6a737d; font-size: 13px; margin-bottom: 12px; min-height: 20px; }
+    #chat { border: 1px solid var(--border); border-radius: 10px; padding: 12px; height: 65vh;
+            overflow-y: auto; background: #fafbfc; display: flex; flex-direction: column; gap: 6px; }
+    .msg { padding: 8px 12px; border-radius: 10px; max-width: 85%; white-space: pre-wrap; word-wrap: break-word;
+           line-height: 1.5; }
+    .msg.user  { background: var(--user); align-self: flex-end; }
+    .msg.agent { background: var(--agent); align-self: flex-start; }
+    .msg.tool  { background: var(--tool); align-self: flex-start; font-size: 12px; color: #735c00; font-style: italic; }
+    .msg.err   { background: var(--err); align-self: flex-start; color: #900; }
+    form { display: flex; gap: 8px; margin-top: 12px; }
+    #input { flex: 1; padding: 10px 12px; font-size: 15px; border: 1px solid #ccc; border-radius: 8px; }
+    #input:focus { outline: none; border-color: #0969da; }
+    button { padding: 10px 20px; font-size: 15px; border: none; background: #0969da; color: white;
+             border-radius: 8px; cursor: pointer; }
+    button:disabled { background: #aaa; cursor: not-allowed; }
+    .cursor::after { content: "▋"; opacity: 0.6; animation: blink 1s steps(2) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+  </style>
+</head>
+<body>
+  <h2>ACP Demo · 与 Kiro CLI 聊天</h2>
+  <div id="status">连接中…</div>
+  <div id="chat"></div>
+  <form id="form">
+    <input id="input" autocomplete="off" placeholder="输入消息后回车，Shift+Enter 换行" disabled />
+    <button id="send" type="submit" disabled>发送</button>
+  </form>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const chat = $("chat"), statusEl = $("status"), form = $("form"), input = $("input"), send = $("send");
+    let currentBubble = null;
+
+    function add(cls, text) {
+      const div = document.createElement("div");
+      div.className = "msg " + cls;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      return div;
+    }
+
+    const proto = location.protocol === "https:" ? "wss" : "ws";
+    const ws = new WebSocket(`${proto}://${location.host}/ws`);
+
+    ws.onopen = () => (statusEl.textContent = "✓ 已连接，正在启动 Kiro Agent…");
+    ws.onclose = () => {
+      statusEl.textContent = "✗ 连接已关闭";
+      input.disabled = send.disabled = true;
+      if (currentBubble) currentBubble.classList.remove("cursor");
+    };
+    ws.onerror = () => (statusEl.textContent = "⚠ WebSocket 错误");
+    ws.onmessage = (ev) => {
+      const e = JSON.parse(ev.data);
+      switch (e.type) {
+        case "ready":
+          statusEl.textContent = `✓ ${e.agent}  ·  session ${e.session}`;
+          input.disabled = send.disabled = false;
+          input.focus();
+          break;
+        case "chunk":
+          if (!currentBubble) {
+            currentBubble = add("agent", "");
+            currentBubble.classList.add("cursor");
+          }
+          // 取掉光标后追加文本，再加回光标
+          currentBubble.classList.remove("cursor");
+          currentBubble.textContent += e.text;
+          currentBubble.classList.add("cursor");
+          chat.scrollTop = chat.scrollHeight;
+          break;
+        case "thought":
+          // 简化：忽略思考过程；如需展示，把下行注释打开
+          // add("tool", "💭 " + e.text);
+          break;
+        case "tool":
+          add("tool", `🔧 ${e.kind}: ${e.title}`);
+          break;
+        case "end":
+          if (currentBubble) currentBubble.classList.remove("cursor");
+          currentBubble = null;
+          input.disabled = send.disabled = false;
+          input.focus();
+          break;
+        case "error":
+          add("err", "错误: " + e.message);
+          input.disabled = send.disabled = false;
+          break;
+      }
+    };
+
+    form.onsubmit = (ev) => {
+      ev.preventDefault();
+      const text = input.value.trim();
+      if (!text || ws.readyState !== WebSocket.OPEN) return;
+      add("user", text);
+      ws.send(JSON.stringify({ type: "prompt", text }));
+      input.value = "";
+      input.disabled = send.disabled = true;
+      currentBubble = null;
+    };
+
+    // Shift+Enter 换行；Enter 发送（input 是单行，所以这里仅为以后扩展 textarea 留口）
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        // 由 form submit 处理
+      }
+    });
+  </script>
+</body>
+</html>

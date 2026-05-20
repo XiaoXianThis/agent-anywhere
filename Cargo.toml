@@ -1,0 +1,28 @@
+[package]
+name = "acp-demo"
+version = "0.1.0"
+edition = "2024"
+default-run = "acp-demo"
+
+[dependencies]
+agent-client-protocol = "0.12"
+tokio = { version = "1", features = ["full"] }
+axum = { version = "0.8", features = ["ws"] }
+futures = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# 默认 binary：基于 axum + WebSocket 的网页聊天前端
+[[bin]]
+name = "acp-demo"
+path = "src/main.rs"
+
+# 命令行版的 ACP 客户端（一次性 prompt）
+[[bin]]
+name = "cli"
+path = "src/bin/cli.rs"
+
+# 最简的 ACP Agent（被其他客户端连接）
+[[bin]]
+name = "agent"
+path = "src/bin/agent.rs"
