@@ -5,12 +5,22 @@ edition = "2024"
 default-run = "acp-demo"
 
 [dependencies]
-agent-client-protocol = "0.12"
+agent-client-protocol = { version = "0.12", features = ["unstable_session_model"] }
 tokio = { version = "1", features = ["full"] }
 axum = { version = "0.8", features = ["ws"] }
+axum-extra = { version = "0.10", features = ["cookie-signed"] }
+tower-http = { version = "0.6", features = ["fs"] }
 futures = "0.3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+rusqlite = { version = "0.32", features = ["bundled"] }
+uuid = { version = "1", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+sha2 = "0.10"
+hex = "0.4"
+rand = "0.8"
+time = "0.3"
+dotenvy = "0.15"
 
 # 默认 binary：基于 axum + WebSocket 的网页聊天前端
 [[bin]]

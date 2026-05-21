@@ -1,0 +1,64 @@
+[
+  {
+    "id": "kiro",
+    "name": "Kiro",
+    "command": "kiro-cli",
+    "args": ["acp"],
+    "description": "Kiro AI 编程助手",
+    "color": "#8b5cf6",
+    "fallbackConfigOptions": [
+      {
+        "id": "model",
+        "name": "模型",
+        "category": "model",
+        "type": "select",
+        "currentValue": "auto",
+        "options": [
+          { "value": "auto", "name": "Auto", "description": "自动路由最优模型" },
+          { "value": "claude-opus-4.7", "name": "Claude Opus 4.7", "description": "最强编程模型，自适应思考" },
+          { "value": "claude-opus-4.6", "name": "Claude Opus 4.6", "description": "大型代码库和规范" },
+          { "value": "claude-sonnet-4.6", "name": "Claude Sonnet 4.6", "description": "高效高智能" },
+          { "value": "claude-sonnet-4.5", "name": "Claude Sonnet 4.5", "description": "强自主编程" },
+          { "value": "claude-sonnet-4.0", "name": "Claude Sonnet 4.0", "description": "稳定基线" },
+          { "value": "claude-haiku-4.5", "name": "Claude Haiku 4.5", "description": "快速低成本" },
+          { "value": "deepseek-3.2", "name": "DeepSeek 3.2", "description": "开源低成本" },
+          { "value": "minimax-m2.5", "name": "MiniMax M2.5", "description": "前沿低成本" },
+          { "value": "glm-5", "name": "GLM-5", "description": "长上下文智能体" },
+          { "value": "qwen3-coder-next", "name": "Qwen3 Coder Next", "description": "最低成本" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "opencode",
+    "name": "OpenCode",
+    "command": "opencode",
+    "args": ["acp"],
+    "description": "开源终端 AI 编程智能体",
+    "color": "#f97316"
+  },
+  {
+    "id": "pi",
+    "name": "Pi",
+    "command": "pi-acp",
+    "args": [],
+    "description": "极简终端编程智能体",
+    "color": "#06b6d4",
+    "fallbackConfigOptions": [
+      {
+        "id": "model",
+        "name": "模型",
+        "category": "model",
+        "type": "select",
+        "currentValue": "default",
+        "options": [
+          { "value": "default", "name": "默认", "description": "使用 pi 配置的默认模型" },
+          { "value": "claude-sonnet-4", "name": "Claude Sonnet 4", "description": "Anthropic Sonnet" },
+          { "value": "claude-opus-4", "name": "Claude Opus 4", "description": "Anthropic Opus" },
+          { "value": "gpt-4o", "name": "GPT-4o", "description": "OpenAI GPT-4o" },
+          { "value": "gemini-2.5-pro", "name": "Gemini 2.5 Pro", "description": "Google Gemini" }
+        ]
+      }
+    ]
+  }
+]

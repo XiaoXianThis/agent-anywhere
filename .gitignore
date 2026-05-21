@@ -1,1 +1,12 @@
 /target
+/static/dist
+/frontend/node_modules
+/frontend/dist
+
+# SQLite database
+*.db
+*.db-wal
+*.db-shm
+
+# Environment
+.env
